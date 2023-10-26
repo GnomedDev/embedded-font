@@ -5,7 +5,7 @@ authors = ["Florian Blasius <flovanpt@posteo.de>"]
 edition = "2018"
 license = "MIT"
 description = "Font rendering (ttf and otf) with embedded-graphics."
-repository = "https://codeberg.org/morphUI/embedded_font"
+repository = "https://github.com/GnomedDev/embedded-font"
 keywords = [
     "text",
     "font",
