@@ -6,18 +6,14 @@ edition = "2018"
 license = "MIT"
 description = "Font rendering (ttf and otf) with embedded-graphics."
 repository = "https://github.com/GnomedDev/embedded-font"
-keywords = [
-    "text",
-    "font",
-    "embedded",
-    "no_std"
-]
+keywords = ["text", "font", "embedded", "no_std"]
 
 [dependencies]
 embedded-graphics = "0.8"
+num-traits = { version = "0.2.19", default-features = false }
 rusttype = { version = "0.9.2", default-features = false }
 
-[dev-dependencies] 
+[dev-dependencies]
 embedded-graphics-simulator = "0.5"
 embedded-text = "0.6"
 

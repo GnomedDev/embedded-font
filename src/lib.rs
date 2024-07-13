@@ -14,6 +14,10 @@ mod stdlib {
     pub use core::*;
 }
 
+// Used by no_std targets for f32::ceil.
+#[allow(unused)]
+use num_traits::float::FloatCore as _;
+
 use stdlib::{f32, vec::Vec};
 
 use embedded_graphics::{
