@@ -10,7 +10,7 @@ use std as stdlib;
 
 #[cfg(not(feature = "std"))]
 mod stdlib {
-    pub use ::alloc::{borrow, boxed, collections, format, rc, string, vec};
+    pub use ::alloc::vec;
     pub use core::*;
 }
 
@@ -173,9 +173,7 @@ where
 
         let v_metrics = self.font.v_metrics(scale);
         let offset = rusttype::point(0.0, v_metrics.ascent);
-
-        let glyphs: Vec<rusttype::PositionedGlyph> =
-            self.font.layout(text, scale, offset).collect();
+        let glyphs: Vec<_> = self.font.layout(text, scale, offset).collect();
 
         let width = glyphs
             .iter()
@@ -190,17 +188,17 @@ where
 
         let height = self.font_size as i32;
 
-        let mut pixels = Vec::new();
+        self.draw_background(width as u32, position, target)?;
 
         if let Some(text_color) = self.text_color {
             for g in glyphs.iter() {
                 if let Some(bb) = g.pixel_bounding_box() {
+                    let mut res = Ok(());
                     g.draw(|off_x, off_y, v| {
                         let off_x = off_x as i32 + bb.min.x;
                         let off_y = off_y as i32 + bb.min.y;
                         // There's still a possibility that the glyph clips the boundaries of the bitmap
-                        if off_x >= 0 && off_x < width as i32 && off_y >= 0 && off_y < height
-                        {
+                        if off_x >= 0 && off_x < width && off_y >= 0 && off_y < height {
                             let c = (v * 255.0) as u32;
 
                             let (text_r, text_g, text_b, text_a) =
@@ -214,11 +212,15 @@ where
                                 self.background_color,
                             );
 
-                            if text_a > 0 {
-                                pixels.push(Pixel(
+                            if text_a != 0 {
+                                let px = Pixel(
                                     Point::new(position.x + off_x, position.y + off_y),
                                     Rgb888::new(text_r, text_g, text_b).into(),
-                                ));
+                                );
+
+                                if let Err(err) = target.draw_iter(core::iter::once(px)) {
+                                    res = Err(err)
+                                };
                             }
                         }
                     });
@@ -226,8 +228,6 @@ where
             }
         }
 
-        self.draw_background(width as u32, position, target)?;
-        target.draw_iter(pixels)?;
         self.draw_strikethrough(width as u32, position, target)?;
         self.draw_underline(width as u32, position, target)?;
 
